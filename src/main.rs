@@ -263,7 +263,13 @@ fn main() {
         low_orbit: 1_000_000.0,
     };
 
-    let semimajors: &Semimajors = &[&mercury, &venus, &earth, &mars, &jupiter, &saturn, &uranus, &neptune].into_iter().map(|planet| (planet.name, planet.orbit.unwrap().1, Some(planet))).collect::<Vec<_>>();
+    let semimajors: &Semimajors = &[
+        &mercury, &venus, &earth, &mars, &jupiter, &saturn, &uranus, &neptune,
+    ]
+    .into_iter()
+    .map(|planet| (planet.name, planet.orbit.unwrap().1, Some(planet)))
+    .collect::<Vec<_>>();
+
     fn launch<'a>(planet: &'a Planet<'a>) -> (f64, Orbit<'a>) {
         let orbit = Orbit {
             planet,
