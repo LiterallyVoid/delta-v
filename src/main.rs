@@ -66,7 +66,7 @@ impl Orbit<'_> {
 
     pub fn velocity_at_altitude(&self, altitude: f64) -> f64 {
         let r = altitude + self.planet.radius;
-        return (G * self.planet.mass * (2.0 / r - 1.0 / self.semi_major())).sqrt();
+        (G * self.planet.mass * (2.0 / r - 1.0 / self.semi_major())).sqrt()
     }
 
     fn burn(&self, altitude: f64, new_orbit: Self) -> (f64, Self) {
@@ -75,7 +75,7 @@ impl Orbit<'_> {
 
         (
             orbit_change_delta_v(
-                &self.planet,
+                self.planet,
                 altitude,
                 self.semi_major(),
                 new_orbit.semi_major(),
@@ -157,14 +157,14 @@ pub fn orbit_change_delta_v(
 
     // sqrt(a + b) = x + y = sqrt(x^2 + y^2)
 
-    return mu.sqrt() * (v_1 - v_0).abs();
+    mu.sqrt() * (v_1 - v_0).abs()
 }
 
 /// Return the nominal orbital velocity of a satellite that's orbiting around `planet`, with a
 /// semi major of `semi_major`.
 pub fn velocity_from_semi_major(planet: &Planet, semi_major: f64) -> f64 {
     let mu = G * planet.mass;
-    return (mu * (2.0 / semi_major - 1.0 / semi_major)).sqrt();
+    (mu * (2.0 / semi_major - 1.0 / semi_major)).sqrt()
 }
 
 pub fn calculate_escape_dv(planet: &Planet, dv: f64) -> f64 {
@@ -354,7 +354,7 @@ fn main() {
     for (i, a) in semimajors.iter().enumerate() {
         let mut orbit;
         let (dv_launch, dv_escape);
-        (dv_launch, orbit) = launch(&a.2.unwrap());
+        (dv_launch, orbit) = launch(a.2.unwrap());
 
         (dv_escape, orbit) = orbit.with_escape();
         println!(
@@ -420,7 +420,7 @@ fn main() {
             for (j, b) in semimajors.iter().enumerate().skip(i + 1) {
                 let mut hopping_dv = 0.0;
                 for k in i..j {
-                    hopping_dv += dv_between_ground_truth(&hops, k, k + 1);
+                    hopping_dv += dv_between_ground_truth(hops, k, k + 1);
                     if k > i {
                         hopping_dv += fake_delta_vs[k];
                     }
@@ -428,7 +428,7 @@ fn main() {
 
                 hopping_dv *= 1.0 + fake_delta_vs[0] * 1.0;
 
-                let ground_truth = dv_between_ground_truth(&hops, i, j);
+                let ground_truth = dv_between_ground_truth(hops, i, j);
                 let mut penalty = ((hopping_dv - ground_truth) / ground_truth).abs().powf(2.0);
 
                 if hopping_dv < ground_truth {
@@ -502,7 +502,7 @@ fn main() {
 
         let prev_score = show(&fake_delta_vs, &hops, semimajors, false).unwrap();
         fake_delta_vs[index] += change;
-        let mut works = true;
+        let works = true;
 
         if let Some(score) = show(&fake_delta_vs, &hops, semimajors, false)
             && score < prev_score
@@ -521,12 +521,10 @@ fn main() {
             index = 0;
             if any_worked {
                 change *= 2.0;
+            } else if change > 0.0 {
+                change = -change;
             } else {
-                if change > 0.0 {
-                    change = -change;
-                } else {
-                    change = -change * 0.8;
-                }
+                change = -change * 0.8;
             }
             any_worked = false;
         }
